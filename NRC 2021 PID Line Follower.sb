@@ -1,0 +1,37 @@
+Motor("B")
+Motor("C")
+RGBTH[0]=69 'TH Value of Light Sensor
+light[0]=0
+Last_Error[0]=0
+Error[0]=0
+MP[0]=50 '100
+Kp[0]=0.060 '0.08
+Ki[0]=0 '0.005
+Kd[0]=0 '0.4
+Intergal[0]=0
+Sensor.SetMode(1,2)
+Sensor.SetMode(2,4)
+Sensor.SetMode(3,4)
+Sensor.SetMode(4,2)
+counter=0
+'################################################
+While "True"
+  readVal()
+  PD()
+EndWhile
+'################################################
+Sub readVal
+  rawValue=Sensor.ReadRaw(2,3)
+  rawValuei=Sensor.ReadRaw(3,3)
+  lightVal[0]=rawValue[0]+rawValue[1]+rawValue[2]
+  lightVal[1]=rawValuei[0]+rawValue[1]+rawValuei[2]
+EndSub
+Sub PD
+  Error[0]=lightVal[0]-RGBTH[0]
+  Intergal[0]=Error[0]+Intergal[0]*0.5
+  Correction = (Error[0] * Kp[0]) + (Error[0] - Last_Error[0])*Kd[0] + Intergal[0]*Ki[0]
+  Motor.StartSync("BC",Math.Max(Math.Min((TP[0] + Correction),100),-100),Math.Max(Math.Min((TP[0] - Correction),100),-100))
+  Last_Error[0] = Error[0]
+EndSub
+  
+'29/4/2022  
