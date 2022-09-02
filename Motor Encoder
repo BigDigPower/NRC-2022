@@ -1,0 +1,25 @@
+Encoder = 0
+
+Sub Forward
+  B_Degree = 0
+  C_Degree = 0
+
+  Correction = 0
+
+  Motor.ResetCount("BC")
+  
+  While Math.Abs(B_Degree) < Math.Abs(Encoder)
+    B_Degree = Motor.GetCount("B") 
+    C_Degree = Motor.GetCount("C")
+    Correction = (B_Degree - C_Degree)*0.5
+    Motor.StartSync("BC",Encoder/Math.Abs(Encoder)*100 - Correction,Encoder/Math.Abs(Encoder)*100  + Correction)
+  EndWhile
+EndSub
+
+################################################################################################################################
+Motor.Invert("B")
+Motor.Invert("C")
+Encoder=690
+Forward()
+Motor.Stop("BC")
+################################################################################################################################
