@@ -1,0 +1,43 @@
+Sensor.SetMode(1, 4)
+Sensor.SetMode(2, 4)
+Sensor.SetMode(3, 0)
+Sensor.SetMode(4, 4)
+
+Sub readVal
+  rawValue = Sensor.ReadRaw(2,3) 'read RGB values of the floor
+  rawValuei = Sensor.ReadRaw(4,3) 'read RGB values of left
+  rawValueii = Sensor.ReadRaw(1,3) 'read RGB values of right
+  lightVal[0] = rawValue[0] + rawValue[1] + rawValue[2]
+  lightVal[3] = rawValue[1]
+  lightVal[1] = rawValuei[0] + rawValuei[1] + rawValuei[2]
+  lightVal[2] = rawValueii[0] + rawValueii[1] + rawValueii[2]
+  If (rawValue[0] + rawValue[1] + rawValue[2]) <> 0 Then
+    R_floor = ( rawValue[0] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+    G_floor = ( rawValue[1] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+    B_floor = ( rawValue[2] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+  Else
+    R_floor = 0
+    G_floor = 0
+    B_floor = 0
+  EndIf
+  If (rawValuei[0] + rawValuei[1] + rawValuei[2]) <> 0 Then
+    R_left = ( rawValuei[0] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+    G_left = ( rawValuei[1] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+    B_left = ( rawValuei[2] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+  Else
+    R_left = 0
+    G_left = 0
+    B_left = 0
+  EndIf
+  If (rawValueii[0] + rawValueii[1] + rawValueii[2]) <> 0 Then
+    R_right = ( rawValueii[0] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+    G_right = ( rawValueii[1] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+    B_right = ( rawValueii[2] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+  Else
+    R_right = 0
+    G_right = 0
+    B_right = 0
+  EndIf
+EndSub
+
+'9/2/2022
