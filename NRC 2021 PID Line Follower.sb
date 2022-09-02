@@ -1,39 +1,72 @@
-Motor("B")
-Motor("C")
-RGBTH[0]=69 'TH Value of Light Sensor
-light[0]=0
-Last_Error[0]=0
-Error[0]=0
-MP[0]=50 '100
-Kp[0]=0.060 '0.08
-Ki[0]=0 '0.005
-Kd[0]=0 '0.4
-Intergal[0]=0
-Sensor.SetMode(1,2)
-Sensor.SetMode(2,4)
-Sensor.SetMode(3,4)
-Sensor.SetMode(4,2)
-counter=0
-'################################################
+
+TotalRGBTH[0] = 275 'TH Value of Sensor 2
+lightVal[0] = 0
+
+Last_Error = 0
+Error = 0
+
+TP[0] = 20 '100
+
+Kp[0] = 0.07 '0.08
+Kd[0] = 0.7 '0.4
+
+baseSpeed = 0
+
+Sensor.SetMode(1, 4)
+Sensor.SetMode(2, 4)
+Sensor.SetMode(3, 0)
+Sensor.SetMode(4, 4)
+
+Sub readVal
+  rawValue = Sensor.ReadRaw(2,3) 'read RGB values of the floor
+  rawValuei = Sensor.ReadRaw(4,3) 'read RGB values of left
+  rawValueii = Sensor.ReadRaw(1,3) 'read RGB values of right
+  lightVal[0] = rawValue[0] + rawValue[1] + rawValue[2]
+  lightVal[3] = rawValue[1]
+  lightVal[1] = rawValuei[0] + rawValuei[1] + rawValuei[2]
+  lightVal[2] = rawValueii[0] + rawValueii[1] + rawValueii[2]
+  If (rawValue[0] + rawValue[1] + rawValue[2]) <> 0 Then
+    R_floor = ( rawValue[0] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+    G_floor = ( rawValue[1] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+    B_floor = ( rawValue[2] / (rawValue[0] + rawValue[1] + rawValue[2]) )*100
+  Else
+    R_floor = 0
+    G_floor = 0
+    B_floor = 0
+  EndIf
+  If (rawValuei[0] + rawValuei[1] + rawValuei[2]) <> 0 Then
+    R_left = ( rawValuei[0] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+    G_left = ( rawValuei[1] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+    B_left = ( rawValuei[2] / (rawValuei[0] + rawValuei[1] + rawValuei[2]) )*100
+  Else
+    R_left = 0
+    G_left = 0
+    B_left = 0
+  EndIf
+  If (rawValueii[0] + rawValueii[1] + rawValueii[2]) <> 0 Then
+    R_right = ( rawValueii[0] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+    G_right = ( rawValueii[1] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+    B_right = ( rawValueii[2] / (rawValueii[0] + rawValueii[1] + rawValueii[2]) )*100
+  Else
+    R_right = 0
+    G_right = 0
+    B_right = 0
+  EndIf
+EndSub
+
+Sub PD
+  Error = lightVal[0] - TotalRGBTH[0]
+  Correction = (Error * Kp[0]) + (Error - Last_Error)*Kd[0]
+  Motor.StartSync("BC",Math.Max(Math.Min((TP[0] + Correction),100),-100),Math.Max(Math.Min((TP[0] - Correction),100),-100))
+  Last_Error = Error
+EndSub
+
+
+##################################################################################################################################
 While "True"
   readVal()
   PD()
 EndWhile
-'################################################
-Sub readVal
-  rawValue=Sensor.ReadRaw(2,3)
-  rawValuei=Sensor.ReadRaw(3,3)
-  lightVal[0]=rawValue[0]+rawValue[1]+rawValue[2]
-  lightVal[1]=rawValuei[0]+rawValue[1]+rawValuei[2]
-EndSub
-Sub PD
-  Error[0]=lightVal[0]-RGBTH[0]
-  Intergal[0]=Error[0]+Intergal[0]*0.5
-  Correction = (Error[0] * Kp[0]) + (Error[0] - Last_Error[0])*Kd[0] + Intergal[0]*Ki[0]
-  Motor.StartSync("BC",Math.Max(Math.Min((TP[0] + Correction),100),-100),Math.Max(Math.Min((TP[0] - Correction),100),-100))
-  Last_Error[0] = Error[0]
-EndSub
-  
+##################################################################################################################################
 
-  
 '29/4/2022  
